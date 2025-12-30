@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Behaviour Prediction</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Chart.js for graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🛒 Customer Behaviour Prediction</h1>
+      <p>Fill in session details to predict if the customer will make a purchase.</p>
+    </header>
+
+    <main class="grid">
+      <!-- Form Section -->
+      <section class="card">
+        <h2>📋 Input Features</h2>
+        <form id="predictForm">
+
+          <h3>Numerical Features</h3>
+          <label>Administrative:
+            <input type="number" id="administrative" required>
+          </label>
+          <label>Administrative Duration:
+            <input type="number" id="administrative_duration" step="0.1" required>
+          </label>
+          <label>Informational:
+            <input type="number" id="informational" required>
+          </label>
+          <label>Informational Duration:
+            <input type="number" id="informational_duration" step="0.1" required>
+          </label>
+          <label>Product Related:
+            <input type="number" id="product_related" required>
+          </label>
+          <label>Product Related Duration:
+            <input type="number" id="product_related_duration" step="0.1" required>
+          </label>
+          <label>Bounce Rates:
+            <input type="number" id="bounce_rates" step="0.001" required>
+          </label>
+          <label>Exit Rates:
+            <input type="number" id="exit_rates" step="0.001" required>
+          </label>
+          <label>Page Values:
+            <input type="number" id="page_values" step="0.1" required>
+          </label>
+          <label>Special Day:
+            <input type="number" id="special_day" step="0.1" min="0" max="1" required>
+          </label>
+
+          <h3>Categorical Features</h3>
+          <label>Month:
+            <select id="month" required>
+              <option value="">-- Select --</option>
+              <option value="Jan">Jan</option>
+              <option value="Feb">Feb</option>
+              <option value="Mar">Mar</option>
+              <option value="Apr">Apr</option>
+              <option value="May">May</option>
+              <option value="June">June</option>
+              <option value="Jul">Jul</option>
+              <option value="Aug">Aug</option>
+              <option value="Sep">Sep</option>
+              <option value="Oct">Oct</option>
+              <option value="Nov">Nov</option>
+              <option value="Dec">Dec</option>
+            </select>
+          </label>
+
+          <label>Operating System:
+            <input type="number" id="operating_system" required>
+          </label>
+          <label>Browser:
+            <input type="number" id="browser" required>
+          </label>
+          <label>Region:
+            <input type="number" id="region" required>
+          </label>
+          <label>Traffic Type:
+            <input type="number" id="traffic_type" required>
+          </label>
+
+          <label>Visitor Type:
+            <select id="visitor_type" required>
+              <option value="">-- Select --</option>
+              <option value="Returning_Visitor">Returning Visitor</option>
+              <option value="New_Visitor">New Visitor</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+
+          <label>Weekend:
+            <select id="weekend" required>
+              <option value="">-- Select --</option>
+              <option value="TRUE">True</option>
+              <option value="FALSE">False</option>
+            </select>
+          </label>
+
+          <div class="form-actions">
+            <button type="submit">🔮 Get Prediction</button>
+            <button type="reset" class="secondary">Reset</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Results Section -->
+      <section class="card">
+        <h2>📊 Prediction Result</h2>
+        <div id="result" class="result-box">Fill the form and click Predict</div>
+
+        <h3>Probability Chart</h3>
+        <canvas id="probabilityChart" width="400" height="200"></canvas>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+  document.getElementById("predictionForm").addEventListener("submit", async function(event) {
+  event.preventDefault();
+
+  const formData = {
+    Administrative: parseFloat(document.getElementById("Administrative").value),
+    Administrative_Duration: parseFloat(document.getElementById("Administrative_Duration").value),
+    Informational: parseFloat(document.getElementById("Informational").value),
+    Informational_Duration: parseFloat(document.getElementById("Informational_Duration").value),
+    ProductRelated: parseFloat(document.getElementById("ProductRelated").value),
+    ProductRelated_Duration: parseFloat(document.getElementById("ProductRelated_Duration").value),
+    BounceRates: parseFloat(document.getElementById("BounceRates").value),
+    ExitRates: parseFloat(document.getElementById("ExitRates").value),
+    PageValues: parseFloat(document.getElementById("PageValues").value),
+    SpecialDay: parseFloat(document.getElementById("SpecialDay").value),
+    Month: document.getElementById("Month").value,
+    OperatingSystems: parseInt(document.getElementById("OperatingSystems").value),
+    Browser: parseInt(document.getElementById("Browser").value),
+    Region: parseInt(document.getElementById("Region").value),
+    TrafficType: parseInt(document.getElementById("TrafficType").value),
+    VisitorType: document.getElementById("VisitorType").value,
+    Weekend: document.getElementById("Weekend").checked ? 1 : 0,
+  };
+
+  const response = await fetch("http://127.0.0.1:5000/predict", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(formData),
+  });
+
+  const result = await response.json();
+  document.getElementById("result").innerText =
+    result.prediction === 1 ? "🟢 Likely to Purchase" : "🔴 Not Likely to Purchase";
+});
+
+</body>
+</html>
